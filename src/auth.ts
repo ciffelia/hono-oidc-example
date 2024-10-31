@@ -163,9 +163,9 @@ const getAndDeleteAuthCookie = (c: Context): AuthCookie | undefined => {
 	const options = {
 		path: CALLBACK_PATH,
 	};
-	const state = deleteCookie(c, "state", options);
-	const nonce = deleteCookie(c, "nonce", options);
-	const codeVerifier = deleteCookie(c, "code_verifier", options);
+	const state = deleteCookie(c, STATE_COOKIE_NAME, options);
+	const nonce = deleteCookie(c, NONCE_COOKIE_NAME, options);
+	const codeVerifier = deleteCookie(c, CODE_VERIFIER_COOKIE_NAME, options);
 
 	if (
 		state === undefined ||

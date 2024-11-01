@@ -3,16 +3,13 @@ import { env } from "hono/adapter";
 import { deleteCookie, setCookie } from "hono/cookie";
 import * as client from "openid-client";
 
-const SIGN_IN_PATH = "/auth/sign_in";
-const CALLBACK_PATH = "/auth/callback";
-
 const STATE_COOKIE_NAME = "state";
 const NONCE_COOKIE_NAME = "nonce";
 const CODE_VERIFIER_COOKIE_NAME = "code_verifier";
 
 export const authRoute = new Hono();
 
-authRoute.get(SIGN_IN_PATH, async (c) => {
+authRoute.get("/auth/sign_in", async (c) => {
 	const referrer = c.req.header("Referer");
 	if (
 		referrer === undefined ||
@@ -29,7 +26,7 @@ authRoute.get(SIGN_IN_PATH, async (c) => {
 	const nonce = client.randomNonce();
 	const codeVerifier = client.randomPKCECodeVerifier();
 	const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
-	setAuthCookie(c, { state, nonce, codeVerifier });
+	setAuthCookie(c, authEnv, { state, nonce, codeVerifier });
 
 	const redirectUrl = client.buildAuthorizationUrl(config, {
 		redirect_uri: authEnv.OIDC_REDIRECT_URI.href,
@@ -43,11 +40,11 @@ authRoute.get(SIGN_IN_PATH, async (c) => {
 	return c.redirect(redirectUrl.href);
 });
 
-authRoute.get(CALLBACK_PATH, async (c) => {
+authRoute.get("/auth/callback", async (c) => {
 	const authEnv = getAuthEnv(c);
 	const config = await fetchClientConfig(authEnv);
 
-	const cookie = getAndDeleteAuthCookie(c);
+	const cookie = getAndDeleteAuthCookie(c, authEnv);
 	if (cookie === undefined) {
 		c.status(400);
 		return c.text("missing required cookies");
@@ -147,10 +144,11 @@ type AuthCookie = {
 
 const setAuthCookie = (
 	c: Context,
+	{ OIDC_REDIRECT_URI }: AuthEnv,
 	{ state, nonce, codeVerifier }: AuthCookie,
 ) => {
 	const options = {
-		path: CALLBACK_PATH,
+		path: OIDC_REDIRECT_URI.pathname,
 		httpOnly: true,
 		secure: true,
 	};
@@ -159,9 +157,12 @@ const setAuthCookie = (
 	setCookie(c, CODE_VERIFIER_COOKIE_NAME, codeVerifier, options);
 };
 
-const getAndDeleteAuthCookie = (c: Context): AuthCookie | undefined => {
+const getAndDeleteAuthCookie = (
+	c: Context,
+	{ OIDC_REDIRECT_URI }: AuthEnv,
+): AuthCookie | undefined => {
 	const options = {
-		path: CALLBACK_PATH,
+		path: OIDC_REDIRECT_URI.pathname,
 	};
 	const state = deleteCookie(c, STATE_COOKIE_NAME, options);
 	const nonce = deleteCookie(c, NONCE_COOKIE_NAME, options);

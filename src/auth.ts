@@ -3,9 +3,9 @@ import { env } from "hono/adapter";
 import { deleteCookie, setCookie } from "hono/cookie";
 import * as client from "openid-client";
 
-const STATE_COOKIE_NAME = "state";
-const NONCE_COOKIE_NAME = "nonce";
-const CODE_VERIFIER_COOKIE_NAME = "code_verifier";
+const STATE_COOKIE_NAME = "oidc_state";
+const NONCE_COOKIE_NAME = "oidc_nonce";
+const CODE_VERIFIER_COOKIE_NAME = "oidc_code_verifier";
 
 export const authRoute = new Hono();
 

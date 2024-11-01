@@ -9,7 +9,7 @@ const CODE_VERIFIER_COOKIE_NAME = "oidc_code_verifier";
 
 export const authApp = new Hono();
 
-authApp.get("/auth/sign_in", async (c) => {
+authApp.get("/sign_in", async (c) => {
 	const referrer = c.req.header("Referer");
 	if (
 		referrer === undefined ||
@@ -40,7 +40,7 @@ authApp.get("/auth/sign_in", async (c) => {
 	return c.redirect(redirectUrl.href);
 });
 
-authApp.get("/auth/callback", async (c) => {
+authApp.get("/callback", async (c) => {
 	const authEnv = getAuthEnv(c);
 	const config = await fetchClientConfig(authEnv);
 

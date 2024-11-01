@@ -9,6 +9,6 @@ app.get("/", (c) => {
 	);
 });
 
-app.route("/", authApp);
+app.route("/auth", authApp);
 
 export default app;

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { authApp } from "./auth";
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono();
 
 app.get("/", (c) => {
 	return c.html(

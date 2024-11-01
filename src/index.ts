@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { authRoute } from "./auth";
+import { authApp } from "./auth";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -9,6 +9,6 @@ app.get("/", (c) => {
 	);
 });
 
-app.route("/", authRoute);
+app.route("/", authApp);
 
 export default app;

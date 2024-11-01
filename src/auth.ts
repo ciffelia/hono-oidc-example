@@ -7,9 +7,9 @@ const STATE_COOKIE_NAME = "oidc_state";
 const NONCE_COOKIE_NAME = "oidc_nonce";
 const CODE_VERIFIER_COOKIE_NAME = "oidc_code_verifier";
 
-export const authRoute = new Hono();
+export const authApp = new Hono();
 
-authRoute.get("/auth/sign_in", async (c) => {
+authApp.get("/auth/sign_in", async (c) => {
 	const referrer = c.req.header("Referer");
 	if (
 		referrer === undefined ||
@@ -40,7 +40,7 @@ authRoute.get("/auth/sign_in", async (c) => {
 	return c.redirect(redirectUrl.href);
 });
 
-authRoute.get("/auth/callback", async (c) => {
+authApp.get("/auth/callback", async (c) => {
 	const authEnv = getAuthEnv(c);
 	const config = await fetchClientConfig(authEnv);
 
